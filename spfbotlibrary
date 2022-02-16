@@ -1,0 +1,155 @@
+exports.handler = async (event) => {
+   const intentName = event.sessionState.intent.name;
+     
+     console.log(intentName);
+     
+     var userName = " Tim";
+     
+    if (intentName == "WelcomeUser"){
+        
+        if(event.sessionState.intent.slots.user_name != null){
+           
+            userName = event.sessionState.intent.slots.user_name.value.originalValue;
+            return{
+                "sessionState": {
+                  "dialogAction":{
+                      "type": "ElicitIntent"
+                    }
+                },
+                "messages": [{
+                "contentType": "PlainText",
+                "content": "Hi " + userName + ", I'm PPSD's counselling bot. \r\n 1.Are you looking to book PPSD psychologist for internal counselling? \r\n 2.Are you here to arrange a self-referral to external counselling services, 3.Are you here for self-assessment tools?4.Are you severely depressed?5.Mental health resources",
+                }],
+            };
+        }
+    }
+    
+    if(intentName == "Ppsd_counselling"){ 
+         
+         
+        if(event.sessionState.intent.slots.SlotContact !=null){
+             
+             //console.log(event.sessionState.intent.slots);
+             const unit = event.sessionState.intent.slots.SlotUnit.value.originalValue;
+             
+             const contact = event.sessionState.intent.slots.SlotContact.value.originalValue;
+             // console.log("unit contact ok");
+            return {
+                "sessionState": {
+                    "dialogAction" : {
+                        "type" : "Close"
+                    },
+                    "intent": {
+                        "name": "SlotContact",
+                        "state": "Fulfilled"
+                    }
+                },
+                
+                "messages": [{
+                "contentType": "PlainText",
+                "content": "Thank you" + userName + ", We have made an appointment for you to see " + unit + " para-counsellor. The counsellor will call you at " + contact + " within 3 working days",
+                 }]
+            };
+         }
+         
+        
+    }
+    
+    
+    if(intentName == "SelfAssessment"){
+        
+        
+
+        if(event.sessionState.intent.slots.QueryType == null) {
+            
+            console.log(event.sessionState.intent.slots.QueryType);
+            return {
+                "sessionState": {
+                    "dialogAction" : {
+                        "slotToElicit": "QueryType",
+                        "type": "ElicitSlot"
+                    },
+                    "intent": {
+                        "name": "SelfAssessment",
+                        "state": "InProgress"
+                    }
+                },
+                "messages": [{
+                    "contentType": "ImageResponseCard",
+                    "imageResponseCard": {
+                        "title": "What is your current mood  1 to 5? (1 being some what depressed and 5 being severely depressed) :",
+                        "buttons": [
+                            {
+                                "text": "1 ",
+                                "value": "SomewhatDepressed"
+                            },
+                            {
+                                "text": "2 ",
+                                "value": "SomewhatDepressed"
+                            },
+                            {
+                                "text": "3",
+                                "value": "SeverelyDepressed"
+                            },
+                            {
+                                "text": "4 ",
+                                "value": "SeverelyDepressed"
+                            },
+                            {
+                                "text": "5",
+                                "value": "SeverelyDepressed"
+                            }
+                        ]
+                    }
+                }]
+            };
+        }
+        
+        
+        else if(event.sessionState.intent.slots.QueryType.value.originalValue == "SomewhatDepressed") {
+            console.log("feredsdffge");
+            return {
+                "sessionState": {
+                    "dialogAction" : {
+                        "type": "ElicitIntent"
+                    }
+                },    
+                "messages": [{
+                "contentType": "PlainText",
+                "content": "We would you like you to either type in mental-health resources or book an external-counselling for further assistance(only for regular and civilian officers).",
+                }],
+                    
+                
+            };
+        }
+        
+        
+       
+        
+        else if(event.sessionState.intent.slots.QueryType.value.originalValue == "SeverelyDepressed") {
+            return {
+                 "sessionState": {
+                    "dialogAction" : {
+                        "type": "ElicitIntent"
+                    }
+                },    
+                "messages": [{
+                "contentType": "PlainText",
+                "content": "We would  like you type in  either internal counselling or emergency for further help",
+                }],
+                
+            };
+        }
+        
+        
+        
+    }
+    
+    return{
+        "sessionState": {
+            "dialogAction":{
+                "type": "Delegate",
+            }
+        }
+    };
+};
